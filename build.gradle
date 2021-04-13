@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.3'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 28
+        versionName = "1.0"
+
+        applicationId "com.android.inputmethod.latin"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+            }
+        }
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'java/AndroidManifest.xml'
+            java.srcDirs = ['java/src', 'java-overridable/src', 'common/src', 'inputmethodcommon/java']
+            res.srcDirs = ['java/res']
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'native/CMakeLists.txt'
+        }
+    }
+
+
+    signingConfigs {
+        release {
+            keyAlias 'AOSP Release'
+            keyPassword 'android'
+            storeFile file('keystore/aosp-releasekey.jks')
+            storePassword 'android'
+        }
+        debug {
+            keyAlias 'AOSP Release'
+            keyPassword 'android'
+            storeFile file('keystore/aosp-releasekey.jks')
+            storePassword 'android'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    lintOptions {
+        htmlReport false
+        abortOnError false
+        disable 'MissingTranslation'
+        disable 'ExtraTranslation'
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.google.code.findbugs:jsr305:3.0.0'
+}
