@@ -4,7 +4,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        //classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath "com.android.tools.build:gradle:4.2.2"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -57,12 +58,16 @@ android {
             keyPassword 'android'
             storeFile file('keystore/aosp-releasekey.jks')
             storePassword 'android'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
         debug {
             keyAlias 'AOSP Release'
             keyPassword 'android'
             storeFile file('keystore/aosp-releasekey.jks')
             storePassword 'android'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 
@@ -82,6 +87,21 @@ android {
         abortOnError false
         disable 'MissingTranslation'
         disable 'ExtraTranslation'
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (buildType.name == 'release' || buildType.name == 'debug') {
+                    //def createTime = new Date().format("YYYY-MM-dd", TimeZone.getTimeZone("GMT+08:00"))
+                    def createTime = new Date().format("yyyyMMddHHmmss", TimeZone.getTimeZone("GMT+08:00"))
+                    //apk名字-版本号-版本名称-生成时间.apk
+                    outputFileName = "GoogleLatinIME" + defaultConfig.versionName + "_" + buildType.name + "_" + createTime + ".apk"
+                    //outputFileName = "GoogleLatinIME.apk"
+                }
+            }
+        }
     }
 }
 
